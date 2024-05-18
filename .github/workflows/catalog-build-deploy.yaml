@@ -101,7 +101,7 @@ jobs:
         needs:
             - deploy-dev
         if: |
-            github.event.inputs.environment =='ppd'
+            github.event.inputs.environment =='ppd' || needs.deploy-dev.result == 'success'
         steps:
             # Checkout the repo
             - uses: actions/checkout@v4
