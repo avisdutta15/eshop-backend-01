@@ -2,6 +2,14 @@ name: catalog-build-deploy
 
 on:
     workflow_dispatch:
+        inputs:
+            environment:
+                description: The targeted environment to deploy to (all lower environments will also be deployed to)
+                type: choice
+                required: true
+                options:
+                    - dev
+                    - ppd
     
 permissions:
     id-token: write
@@ -32,6 +40,8 @@ jobs:
             name: ppd
         needs:
             - deploy-dev
+        if: |
+            github.event.inputs.environment =='ppd'
         steps:
             - name: Az CLI login via OIDC
               uses: azure/login@v1
