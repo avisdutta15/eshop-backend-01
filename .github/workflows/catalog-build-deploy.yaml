@@ -20,30 +20,55 @@ env:
 
 jobs:
     build:
-     runs-on: ubuntu-latest
-     steps:
-        # Checkout the repo
-        - uses: actions/checkout@v4
+        runs-on: ubuntu-latest
+        steps:
+            # Checkout the repo
+            - uses: actions/checkout@v4
         
-        # Setup .NET Sdk
-        - name: Set up .NET
-          uses: actions/setup-dotnet@v4
-          with: 
-            dotnet-verison: ${{env.DOTNET_VERISON}}
+            # Setup .NET Sdk
+            - name: Set up .NET
+              uses: actions/setup-dotnet@v4
+              with: 
+                dotnet-verison: ${{env.DOTNET_VERISON}}
         
-        # Explore Directory Structure
-        - name: Display Directory Structure
-          run: ls -R
+            # Explore Directory Structure
+            - name: Display Directory Structure
+              run: ls -R
 
-        # Restore Dependencies
-        # - name: Install Dependencies
-        #   run: dotnet restore ./
-    
+            # Restore Dependencies
+            - name: Install Dependencies
+              run: dotnet restore ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj
+
+            # Run dotnet build
+            - name: Build with dotnet
+              run: dotnet build ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj --configuration Release --no-release
+
+            # Run dotnet publish
+            - name: Publish
+              run: |
+                dotnet publish ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj 
+                --configuration Release 
+                --no-build 
+                --output 'catalog/publish'
+
+            # Upload Artifact
+            - name: Upload artifacts for deployment job
+              uses: actions/upload-artifact@v4
+              with:
+                name: 'catalog-artifact'
+                path: 'catalog/publish'
+                if-no-files-found: error
+
     deploy-dev:
         runs-on: ubuntu-latest
         environment: 
             name: dev
+        needs: [build]
         steps:
+            # Checkout the repo
+            - uses: actions/checkout@v4
+  
+            # Download the artifact      
             - name: Az CLI login via OIDC
               uses: azure/login@v1
               with:
