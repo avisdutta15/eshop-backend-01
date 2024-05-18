@@ -85,12 +85,12 @@ jobs:
                 az account show
                 az group list
             
-            - run: echo "Deploying to ${{ matrix.environment }} environment"
+            - run: echo "Deploying to ${{ github.env }} environment"
   
             - name: Deploy to Azure Web App
               uses: azure/webapps-deploy@v3
               with:
-                app-name: eshop-catalog-${{ matrix.environment }}
+                app-name: eshop-catalog-${{ github.env }}
                 package: './publish'
 
             - name: Logout from Azure
