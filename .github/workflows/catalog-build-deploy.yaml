@@ -31,10 +31,6 @@ jobs:
               with: 
                 dotnet-verison: ${{env.DOTNET_VERISON}}
         
-            # Explore Directory Structure
-            - name: Display Directory Structure
-              run: ls -R
-
             # Restore Dependencies
             - name: Install Dependencies
               run: dotnet restore ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj
@@ -64,8 +60,18 @@ jobs:
         steps:
             # Checkout the repo
             - uses: actions/checkout@v4
-  
-            # Download the artifact      
+    
+            # Download the artifact    
+            - name: Download artifact from build job
+              uses: actions/download-artifact@v4
+              with:
+                name: 'catalog-artifact'
+                path: 'catalog/publish'
+
+            # Explore Directory Structure
+            - name: Display Directory Structure
+              run: ls -R
+              
             - name: Az CLI login via OIDC
               uses: azure/login@v1
               with:
@@ -78,6 +84,15 @@ jobs:
               run: |
                 az account show
                 az group list
+            
+            - name: Deploy to Azure Web App
+              uses: azure/webapps-deploy@v3
+              with:
+                app-name: eshop-catalog-${{ matrix.environment }}
+                package: './publish'
+
+            - name: Logout from Azure
+              run: az logout
 
     deploy-ppd:
         runs-on: ubuntu-latest
@@ -88,6 +103,20 @@ jobs:
         if: |
             github.event.inputs.environment =='ppd'
         steps:
+            # Checkout the repo
+            - uses: actions/checkout@v4
+    
+            # Download the artifact    
+            - name: Download artifact from build job
+              uses: actions/download-artifact@v4
+              with:
+                name: 'catalog-artifact'
+                path: 'catalog/publish'
+
+            # Explore Directory Structure
+            - name: Display Directory Structure
+              run: ls -R
+              
             - name: Az CLI login via OIDC
               uses: azure/login@v1
               with:
@@ -100,3 +129,12 @@ jobs:
               run: |
                 az account show
                 az group list
+            
+            - name: Deploy to Azure Web App
+              uses: azure/webapps-deploy@v3
+              with:
+                app-name: eshop-catalog-${{ matrix.environment }}
+                package: './publish'
+
+            - name: Logout from Azure
+              run: az logout
