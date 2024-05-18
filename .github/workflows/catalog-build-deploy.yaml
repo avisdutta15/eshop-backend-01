@@ -137,3 +137,48 @@ jobs:
 
             - name: Logout from Azure
               run: az logout
+    
+    deploy-prod:
+        runs-on: ubuntu-latest
+        environment: 
+            name: prod
+        needs:
+            - deploy-ppd
+        if: |
+            github.event.inputs.environment =='prod' || needs.deploy-ppd.result == 'success'
+        steps:
+            # Checkout the repo
+            - uses: actions/checkout@v4
+    
+            # Download the artifact    
+            - name: Download artifact from build job
+              uses: actions/download-artifact@v4
+              with:
+                name: 'catalog-artifact'
+                path: 'catalog/publish'
+
+            # Explore Directory Structure
+            - name: Display Directory Structure
+              run: ls -R
+              
+            - name: Az CLI login via OIDC
+              uses: azure/login@v1
+              with:
+    
+                client-id: ${{secrets.AZURE_CLIENT_ID}}
+                tenant-id: ${{secrets.AZURE_TENANT_ID}}
+                subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
+
+            - name: Run Az commands
+              run: |
+                az account show
+                az group list
+            
+            - name: Deploy to Azure Web App
+              uses: azure/webapps-deploy@v3
+              with:
+                app-name: eshop-catalog-prod
+                package: 'catalog/publish'
+
+            - name: Logout from Azure
+              run: az logout
