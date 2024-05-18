@@ -88,7 +88,7 @@ jobs:
               uses: azure/webapps-deploy@v3
               with:
                 app-name: eshop-catalog-dev
-                package: './publish'
+                package: 'catalog/publish'
 
             - name: Logout from Azure
               run: az logout
@@ -129,13 +129,11 @@ jobs:
                 az account show
                 az group list
             
-            - run: echo "Deploying to ${{ github.env }} environment"
-  
             - name: Deploy to Azure Web App
               uses: azure/webapps-deploy@v3
               with:
                 app-name: eshop-catalog-ppd
-                package: './publish'
+                package: 'catalog/publish'
 
             - name: Logout from Azure
               run: az logout
