@@ -46,10 +46,7 @@ jobs:
             # Run dotnet publish
             - name: Publish
               run: |
-                dotnet publish ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj 
-                --configuration Release 
-                --no-build 
-                --output 'catalog/publish'
+                dotnet publish ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj --configuration Release --no-build --output 'catalog/publish'
 
             # Upload Artifact
             - name: Upload artifacts for deployment job
