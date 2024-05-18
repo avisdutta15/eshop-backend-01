@@ -84,8 +84,17 @@ jobs:
               run: |
                 az account show
                 az group list
-            
-            - run: echo "Deploying to ${{ github.env }} environment"
+
+            - name: Get Environment Info
+              run: |
+                echo "Run ID: $GITHUB_RUN_ID"
+                echo "Workflow: $GITHUB_WORKFLOW"
+                echo "Action: $GITHUB_ACTION"
+                echo "Repository: $GITHUB_REPOSITORY"
+                echo "Event Name: $GITHUB_EVENT_NAME"
+                echo "Commit SHA: $GITHUB_SHA"
+                echo "Ref: $GITHUB_REF"
+                echo "Run Number: $GITHUB_RUN_NUMBER"
   
             - name: Deploy to Azure Web App
               uses: azure/webapps-deploy@v3
