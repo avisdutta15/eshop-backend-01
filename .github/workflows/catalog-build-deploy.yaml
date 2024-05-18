@@ -41,7 +41,7 @@ jobs:
 
             # Run dotnet build
             - name: Build with dotnet
-              run: dotnet build ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj --configuration Release --no-release
+              run: dotnet build ./catalog/src/Eshop.Catalog.Api/Eshop.Catalog.Api.csproj --configuration Release --no-restore
 
             # Run dotnet publish
             - name: Publish
