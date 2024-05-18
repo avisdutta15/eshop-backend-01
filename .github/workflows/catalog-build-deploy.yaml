@@ -10,6 +10,7 @@ on:
                 options:
                     - dev
                     - ppd
+                    - prod  
     
 permissions:
     id-token: write
