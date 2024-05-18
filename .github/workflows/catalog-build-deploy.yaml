@@ -15,7 +15,30 @@ permissions:
     id-token: write
     contents: read
 
+env:
+    DOTNET_VERISON: 8.0.x    
+
 jobs:
+    build:
+     runs-on: ubuntu-latest
+     steps:
+        # Checkout the repo
+        - uses: actions/checkout@v4
+        
+        # Setup .NET Sdk
+        - name: Set up .NET
+          uses: actions/setup-dotnet@v4
+          with: 
+            dotnet-verison: ${{env.DOTNET_VERISON}}
+        
+        # Explore Directory Structure
+        - name: Display Directory Structure
+          run: ls -R
+
+        # Restore Dependencies
+        # - name: Install Dependencies
+        #   run: dotnet restore ./
+    
     deploy-dev:
         runs-on: ubuntu-latest
         environment: 
