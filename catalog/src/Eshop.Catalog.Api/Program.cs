@@ -1,12 +1,13 @@
 using Eshop.Catalog.Api.Endpoints;
-using Microsoft.Extensions.Configuration;
+using Eshop.Catalog.Data;
+using Eshop.Catalog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAADPostgresDbContext<CatalogContext>(builder.Configuration.GetConnectionString("Catalog"));
+
 
 var app = builder.Build();
 

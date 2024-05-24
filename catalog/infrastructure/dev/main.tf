@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "3.104.0"
     }
+    azuread = {
+      source = "hashicorp/azuread"
+      version = "2.50.0"
+    }
   }
 }
 
@@ -11,7 +15,12 @@ provider "azurerm" {
   features {}
 }
 
+provider "azuread" {  
+}
+
 data "azurerm_subscription" "current" {}
+data "azurerm_client_config" "current" {}
+data "azuread_client_config" "current" {}
 
 
 ###################################################################  dev #################################################################################
@@ -63,6 +72,68 @@ resource "azurerm_federated_identity_credential" "fed_cred_dev" {
   subject             = "repo:avisdutta15/eshop-backend-01:environment:dev"
 }
 
+# Create a Azure AD Group. It will contain the devs and the cicd sp.
+resource "azuread_group" "db_admins_dev" {
+  display_name     = "ag-eshop-pg-admins-dev"
+  owners           = [data.azuread_client_config.current.object_id]
+  security_enabled = true
+
+  members = [
+    azurerm_user_assigned_identity.github_managed_identity_dev.principal_id,
+    "ade13cff-3f3e-43c3-a2dd-ee1bc96d07bd"
+  ]
+}
+
+#Create Postgresql server
+resource "azurerm_postgresql_flexible_server" "pgsql_catalog_dev" {
+  name                   = "psql-eshop-catalog-dev"
+  resource_group_name    = azurerm_resource_group.rg_dev.name
+  location               = azurerm_resource_group.rg_dev.location
+  version                = "12"
+  zone                   = "1"
+
+  storage_mb   = 32768
+  storage_tier = "P4"
+
+  sku_name   = "B_Standard_B1ms"
+
+  authentication {
+    active_directory_auth_enabled = true
+    password_auth_enabled = false
+    tenant_id = data.azurerm_client_config.current.tenant_id
+  }
+}
+
+# Create a postgresql database
+resource "azurerm_postgresql_flexible_server_database" "catalogdb_dev" {
+  name      = "catalog"
+  server_id = azurerm_postgresql_flexible_server.pgsql_catalog_dev.id
+  collation = "en_US.utf8"
+  charset   = "utf8"
+
+  # prevent the possibility of accidental data loss
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+# Assign a Azure AD Postgresql Admin
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "postgres_admin_dev" {
+  server_name         = azurerm_postgresql_flexible_server.pgsql_catalog_dev.name
+  resource_group_name = azurerm_resource_group.rg_dev.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  object_id           = azuread_group.db_admins_dev.object_id
+  principal_name      = azuread_group.db_admins_dev.display_name
+  principal_type      = "Group"
+}
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "localdev_sql_firewall_rule" {
+  name             = "eshop-catalog-pssql-localdev-sql-firewall-rule"
+  server_id        = azurerm_postgresql_flexible_server.pgsql_catalog_dev.id
+  start_ip_address = "49.37.11.115"
+  end_ip_address   = "49.37.11.115"
+}
+
 # These outputs are used to populate the github environment secrets.
 
 # dev User Managed Identity's Client Id. Copy this and paste it as a secret value for key AZURE_CLIENT_ID in dev environment.
@@ -78,6 +149,10 @@ output "user_assigned_managed_identity_tenant_id_dev" {
 # Subscription Id. Copy this and paste it as a secret value for key AZURE_SUBSCRIPTION_ID in repository secret.
 output "user_assigned_managed_identity_subscription_id_dev" {
   value = data.azurerm_subscription.current.subscription_id
+}
+
+output "pgsql_catalog_server_name_dev" {
+  value = azurerm_postgresql_flexible_server.pgsql_catalog_dev.name
 }
 
 ###################################################################  PPD #################################################################################

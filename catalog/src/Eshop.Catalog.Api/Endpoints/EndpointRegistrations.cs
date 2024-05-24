@@ -1,4 +1,5 @@
-﻿using Eshop.Catalog.Api.Endpoints.WeatherForecast;
+﻿using Eshop.Catalog.Api.Endpoints.Catalog;
+using Eshop.Catalog.Api.Endpoints.WeatherForecast;
 
 namespace Eshop.Catalog.Api.Endpoints;
 
@@ -7,6 +8,8 @@ public static class EndpointRegistrations
     public static WebApplication UseCatalogEndpoints(this WebApplication app)
     {
         app.UseWeatherEndpoints();
+        app.UseCatalogTypesEndpoints();
+
         return app;
     }
 
@@ -17,6 +20,17 @@ public static class EndpointRegistrations
         weatherForecastGroup.MapGet("/", GetWeatherForecast.Handle)
                             .WithName("GetWeatherForecast")
                             .WithOpenApi();
+        return app;
+    }
+
+    public static WebApplication UseCatalogTypesEndpoints(this WebApplication app)
+    {
+        var catalogGroup = app.MapGroup("/catalog-types");
+
+        catalogGroup.MapGet("/", GetCatalogTypes.Handle)
+                    .WithName("GetCatalogTypes")
+                    .WithOpenApi();
+
         return app;
     }
 }
