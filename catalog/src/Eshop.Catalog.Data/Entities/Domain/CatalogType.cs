@@ -15,7 +15,7 @@ public class CatalogTypeEntity
     {
         public void Configure(EntityTypeBuilder<CatalogTypeEntity> builder)
         {
-            builder.ToTable("catalog_types", CatalogContextConstants.Schemas.Domain);
+            builder.ToTable("catalog_types", CatalogContextConstants.Schemas.Public);
             builder.HasKey(e => e.Id);
             builder.HasData(
                 new { Id = 1, Type = "T-Shirt" },
