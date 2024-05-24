@@ -18,6 +18,7 @@ if (app.Configuration.GetValue("EnableSwagger", false))
     app.UseSwaggerUI();
 }
 
+app.UseDeveloperExceptionPage();
 app.UseCatalogEndpoints();
 
 app.Run();
