@@ -38,7 +38,7 @@ namespace Eshop.Catalog.Data.Migrations.CatalogMigrations
                     b.HasKey("Id")
                         .HasName("pk_catalog_types");
 
-                    b.ToTable("catalog_types", "domain");
+                    b.ToTable("catalog_types", "public");
 
                     b.HasData(
                         new

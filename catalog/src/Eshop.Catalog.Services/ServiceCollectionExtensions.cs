@@ -9,6 +9,7 @@ using Npgsql;
 public static class ServiceCollectionExtensions
 {
     //Source: https://learn.microsoft.com/en-us/azure/app-service/tutorial-connect-msi-azure-database?tabs=postgresql-sc%2Cuserassigned-sc%2Cdotnet%2Cdotnet-mysql-mi%2Cdotnet-postgres-mi%2Cwindowsclient#3-modify-your-code
+    //        https://learn.microsoft.com/en-us/azure/app-service/tutorial-connect-msi-azure-database?tabs=sqldatabase-sc%2Cuserassigned-sc%2Cdotnet%2Cdotnet-mysql-mi%2Cdotnet-postgres-mi%2Cwindowsclient
     //        https://github.com/microsoft/azure-container-apps/issues/442#issuecomment-1846350428
     // Uncomment the following lines according to the authentication type.
 
@@ -16,11 +17,11 @@ public static class ServiceCollectionExtensions
     //private static readonly DefaultAzureCredential AzureCredentials = new();
 
     // For user-assigned identity.
-    private static readonly DefaultAzureCredential AzureCredentials = new(new DefaultAzureCredentialOptions 
-    { 
+    private static readonly DefaultAzureCredential AzureCredentials = new(new DefaultAzureCredentialOptions
+    {
         ManagedIdentityClientId = Environment.GetEnvironmentVariable("AZURE_POSTGRESQL_CLIENTID")
     });
-    
+
     private static readonly TokenRequestContext OssrdbmsTokenRequest = new(
     [
         "https://ossrdbms-aad.database.windows.net/.default"

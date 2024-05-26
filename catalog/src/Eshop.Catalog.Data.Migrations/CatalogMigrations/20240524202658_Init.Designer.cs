@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Eshop.Catalog.Data.Migrations.CatalogMigrations
 {
     [DbContext(typeof(CatalogContext))]
-    [Migration("20240523155254_InitMigration")]
-    partial class InitMigration
+    [Migration("20240524202658_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,19 @@ namespace Eshop.Catalog.Data.Migrations.CatalogMigrations
                     b.HasKey("Id")
                         .HasName("pk_catalog_types");
 
-                    b.ToTable("catalog_types", "domain");
+                    b.ToTable("catalog_types", "public");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Type = "T-Shirt"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Type = "Pant"
+                        });
                 });
 #pragma warning restore 612, 618
         }
